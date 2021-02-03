@@ -20,7 +20,17 @@ jobs:
       - checkout
       - attach_workspace:
           at: ./target
+      - run: chmod +x ./mvnw 
       - run: ./mvnw test
+
+  deploy:
+    docker:
+      - image: circleci/openjdk:11
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "c8:d1:32:47:a7:13:6f:63:ba:4e:5c:3e:14:50:5a:77"
+      - run: ssh -oStrictHostKeyChecking=no -v $DROPLET_USER@$DROPLET_IP "./deploy_spring_boot.sh"
 
 workflows:
   version: 2
@@ -31,3 +41,15 @@ workflows:
       - test:
           requires:
             - build
+      - hold:
+          type: approval
+          requires:
+           - test
+
+      - deploy:
+          requires:
+            - hold
+          filters:
+            branches:
+              only:
+                - master
