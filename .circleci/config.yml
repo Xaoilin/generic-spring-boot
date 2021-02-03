@@ -8,9 +8,9 @@ jobs:
       - checkout
       - run: ./mvnw -Dmaven.test.skip=true package
       - persist_to_workspace:
-         root: ./
-         paths:
-           - target/
+          root: ./
+          paths:
+            - target/
 
   test:
     docker:
